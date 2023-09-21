@@ -51,8 +51,8 @@ def format_time(hour, minute):
     return f"{hour}:{minute}"
 
 
+# Hämtar relevant info från staden
 def city_information(city):
-    # Hämtar staden vi ska använda oss av
     city_info = get_api(city)
 
     # Hämtar allt vi behöver från dictionary
@@ -61,6 +61,7 @@ def city_information(city):
     date = format_date(city_info['year'], city_info['month'], city_info['day'])
     time = format_time(city_info['hour'], city_info['minute'])
     day_of_week = city_info['day_of_week']
+    hour = city_info['hour']
 
     return {
         'city': city,
@@ -68,7 +69,8 @@ def city_information(city):
         'datetime': datetime,
         'date': date,
         'time': time,
-        'day_of_week': day_of_week
+        'day_of_week': day_of_week,
+        'hour': hour
     }
 
 
@@ -76,8 +78,7 @@ def city_information(city):
 def print_city_info(city_info):
     ui.line()
     ui.echo(f"The city {city_info['city']} is in the timezone of {city_info['timezone']}.")
-    ui.echo(
-        f"Today it is {city_info['day_of_week']} and the date is {city_info['date']} and the time is {city_info['time']}.")
+    ui.echo(f"Today it is {city_info['day_of_week']} and the date is {city_info['date']} and the time is {city_info['time']}.")
     ui.line()
 
 
@@ -107,14 +108,36 @@ def new_city():
         input("ERROR!")
 
 
+# Val 2
+def compare_cities():
+    # Välj två städer
+    city1 = ui.prompt("Enter the first city")
+    city2 = ui.prompt("Enter the second city")
+
+    # Hämtar information om bägge städerna
+    city1_info = city_information(city1)
+    city2_info = city_information(city2)
+
+
+    # För att ta fram endast positivt tal
+    # https://www.w3schools.com/python/ref_func_abs.asp
+    time_difference = abs(int(city1_info['hour']) - int(city2_info['hour']))
+
+    # Skriv ut tidsskillnaden i timmar
+    ui.line()
+    ui.echo(f"The time difference between {city1} and {city2} is {time_difference} hours")
+    ui.line()
+    ui.prompt("Press enter to continue")
+
+
 # -- PROGRAMMET -- #
 while True:
     # UI
     ui.clear()
     ui.line()
-    ui.header("Datum/tider")
+    ui.header("WORLD TIMES")
     ui.line()
-    ui.echo("Din favoritstad:")
+    ui.echo("Your favorite places:")
 
     if not favorites:
         ui.echo("No favorite is saved right now")
@@ -126,7 +149,7 @@ while True:
     ui.header("Choose an option")
     ui.echo("1 - Check a new city")
     ui.echo("2 - Compare cities")
-    ui.echo("3 - Lookup your favorite")
+    ui.echo("3 - Lookup your favorite/s")
     ui.echo("4 - Delete a favorite")
 
     # Användaren får ett val
@@ -136,8 +159,10 @@ while True:
     if choice == "1":
         new_city()
     elif choice == "2":
-        print("")
+        compare_cities()
     elif choice == "3":
+        print("")
+    elif choice == "4":
         print("")
     else:
         input("You did not pick a correct choice, press enter to try again...")
