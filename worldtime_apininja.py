@@ -162,6 +162,9 @@ def delete_favorites():
 
     if delete in favorites:
         favorites.remove(delete)
+        with open("favorites.json", "w+") as f:
+            json.dump(favorites, f)
+
         ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
     else:
         ui.prompt(f"{delete} doesnt exist in the favorites, press enter toc ontinue")
@@ -189,6 +192,7 @@ while True:
     ui.echo("2 - Compare cities")
     ui.echo("3 - Lookup your favorite/s")
     ui.echo("4 - Delete a favorite")
+    ui.echo("5 - Exit")
     ui.line()
 
     # Användaren får ett val
