@@ -208,5 +208,7 @@ while True:
         lookup_favorites()
     elif choice == "4":
         delete_favorites()
+    elif choice == "5":
+        break
     else:
         input("You did not pick a correct choice, press enter to try again...")
