@@ -82,6 +82,7 @@ def print_city_info(city_info):
         f"Today it is {city_info['day_of_week']} and the date is {city_info['date']} and the time is {city_info['time']}.")
 
 
+# -- FUNKTIONER FÖR ALLA VAL -- #
 # Val 1
 def new_city():
     city_to_check = ui.prompt("Type a city")
@@ -147,13 +148,23 @@ def lookup_favorites():
         # Lägg in ny stad varje loop
         # Använd print_city_info för utskrift
 
+
 # Val 4
-#def delete_favorites():
-    #ui.echo("Your favorites right now")
-    #for n in favorites:
-    #    ui.echo(n)
-    #delete = ui.prompt("What city do you want to remove")
-    #favorites.pop()
+def delete_favorites():
+    if not favorites:
+        ui.prompt("You dont have have favorite cities to remove, press enter to continue")
+        return
+    ui.header("Your favorites right now:")
+    for n in favorites:
+        ui.echo(n)
+
+    delete = ui.prompt("What city do you want to remove")
+
+    if delete in favorites:
+        favorites.remove(delete)
+        ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
+    else:
+        ui.prompt(f"{delete} doesnt exist in the favorites, press enter toc ontinue")
 
 
 # -- PROGRAMMET -- #
@@ -192,6 +203,6 @@ while True:
     elif choice == "3":
         lookup_favorites()
     elif choice == "4":
-        print("")
+        delete_favorites()
     else:
         input("You did not pick a correct choice, press enter to try again...")
