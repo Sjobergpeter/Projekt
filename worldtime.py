@@ -9,6 +9,10 @@ favorites = []
 
 # Antons-branch test
 
+with open("city.json", "r") as f:
+    city_choice = json.load(f)
+
+
 if os.path.isfile("favorites.json"):
     with open("favorites.json", "r") as f:
         favorites = json.load(f)
@@ -89,8 +93,7 @@ def print_city_info(city_info):
 # -- FUNKTIONER FÖR ALLA VAL -- #
 # Val 1
 def new_city():
-    city_to_check = ui.prompt("Type a city")
-    city_info = city_information(city_to_check)
+    city_info = city_information(city_choice)
 
     # Utskrift
     print_city_info(city_info)
@@ -102,14 +105,14 @@ def new_city():
     if favorit == "j":
         favorites.append(city_info['city'])
 
-        with open("favorites.json", "w+") as f:
-            json.dump(favorites, f)
+        with open("favorites.json", "w+") as b:
+            json.dump(favorites, b)
 
-        ui.prompt(f"You chose to save {city_to_check} as a favorite, press enter to continue")
+        ui.prompt(f"You chose to save {city_choice} as a favorite, press enter to continue")
 
     elif favorit == "n":
 
-        ui.prompt(f"You chose to not save {city_to_check} as a favorite, press enter to continue")
+        ui.prompt(f"You chose to not save {city_choice} as a favorite, press enter to continue")
 
     else:
         input("ERROR!")
@@ -117,13 +120,13 @@ def new_city():
 
 # Val 2
 def compare_cities():
-    # Välj två städer
-    city1 = ui.prompt("Enter the first city")
-    city2 = ui.prompt("Enter the second city")
+    # Välj en stad att jämföra mot
+    city1 = ui.prompt("Choose a city to compare timezone with")
+    # city2 = ui.prompt("Enter the second city")
 
     # Hämtar information om bägge städerna
     city1_info = city_information(city1)
-    city2_info = city_information(city2)
+    city2_info = city_information(city_choice)
 
     # För att ta fram endast positivt tal används abs
     # https://www.w3schools.com/python/ref_func_abs.asp
@@ -131,7 +134,7 @@ def compare_cities():
 
     # Skriv ut tidsskillnaden i timmar
     ui.line()
-    ui.echo(f"The time difference between {city1} and {city2} is {time_difference} hours")
+    ui.echo(f"The time difference between {city1} and {city_choice} is {time_difference} hours")
     ui.line()
     ui.prompt("Press enter to continue")
 
@@ -192,8 +195,8 @@ while True:
     ui.line()
     ui.header("Choose an option")
     ui.line()
-    ui.echo("1 - Check a new city")
-    ui.echo("2 - Compare cities")
+    ui.echo("1 - Check time and date about the city")
+    ui.echo("2 - Compare with another city")
     ui.echo("3 - Lookup your favorite/s")
     ui.echo("4 - Delete a favorite")
     ui.echo("5 - Exit")
@@ -215,4 +218,4 @@ while True:
     elif choice == "5":
         break
     else:
-        input("You did not pick a correct choice, press enter to try again...")
+        ui.prompt("You did not pick a correct choice, press enter to try again...")
