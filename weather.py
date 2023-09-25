@@ -23,6 +23,8 @@ def weather_temp():
     if weather['temp'] != weather["feels_like"]:
         print (f"the temperature is currently at {weather['temp']}°C but feels like {weather['feels_like']} °C")
     else:
+        
+        
         print (f"the temperature is currently at {weather['temp']}°C")
     print (f"The temperature range today will be between {weather['min_temp']}°C and {weather['max_temp']}°C")
 
@@ -59,4 +61,4 @@ weather_sun()
 
 # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
 
-# hejhej
+# hejdå
