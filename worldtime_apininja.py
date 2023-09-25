@@ -3,6 +3,8 @@ import ui
 import json
 import os
 
+# Test
+
 favorites = []
 
 if os.path.isfile("favorites.json"):
