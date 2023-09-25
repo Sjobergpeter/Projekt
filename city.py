@@ -14,7 +14,7 @@ class City:
         self.longitude = longitude
         self.input_city = input_city
 
-    @staticmethod
+    # @staticmethod
     # Metod som startar UI och inmatning
     def city_start():
         # UI element
@@ -37,7 +37,7 @@ class City:
             print("Error:", response.status_code, response.text)
 
     # Metod för att hämta holiday information från API
-    @staticmethod
+    # @staticmethod
     def get_holiday_api(self):
         city_dict = City.get_city_api(city_obj)
         try:
@@ -104,7 +104,7 @@ for i in holiday_info:
     holiday_list.append([i['date'], i['name']])
 
     # Helgdagslistan sorteras i datumordning och skrivs sedan ut
-    holiday_list.sort(key=lambda item: item[0])
-    for holiday in holiday_list:
-        print(holiday[0], holiday[1])
+holiday_list.sort(key=lambda item: item[0])
+for holiday in holiday_list:
+    print(holiday[0], holiday[1])
 
