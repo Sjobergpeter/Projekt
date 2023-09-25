@@ -1,6 +1,19 @@
 import json
+import os
+import ui
 import pycountry
 import requests
+
+favorites = []
+city = []
+
+if os.path.isfile("favorites.json"):
+    with open("favorites.json", "r") as f:
+        favorites = json.load(f)
+
+if os.path.isfile("city.json"):
+    with open("city.json", "r") as f:
+        city = json.load(f)
 
 
 class City:
@@ -14,21 +27,18 @@ class City:
         self.longitude = longitude
         self.input_city = input_city
 
-    # @staticmethod
     # Metod som startar UI och inmatning
+    @staticmethod
     def city_start():
-        # UI element
-        print('*' * 40)
-        print(f'*{"CITY DATA".center(38)}*')
-        print('*' * 40)
+        ui.line()
         city_obj.input_city = input('Type a city name: > ')
         return city_obj.input_city
 
     # Metod för att hämta city information från API
     @staticmethod
     def get_city_api(self):
-        city = city_obj.input_city
-        url = f'https://api.api-ninjas.com/v1/city?name={city}'
+        city_in = city_obj.input_city
+        url = f'https://api.api-ninjas.com/v1/city?name={city_in}'
         response = requests.get(url, headers={'X-Api-Key': '90lkoFCGJZryQ+TsMHlFTA==akrnZyMBsML9wyo9'})
         if response.status_code == requests.codes.ok:
             response_dict = json.loads(response.text)
@@ -37,7 +47,7 @@ class City:
             print("Error:", response.status_code, response.text)
 
     # Metod för att hämta holiday information från API
-    # @staticmethod
+    @staticmethod
     def get_holiday_api(self):
         city_dict = City.get_city_api(city_obj)
         try:
@@ -86,25 +96,64 @@ class City:
 
 # Skapar objektet som innehåller variabler om efterfrågad stad
 city_obj = City()
-# Startar gränsnittet och inmatning av stad
-City.city_start()
-# Hämtar data från API:erna city och holiday
-city_info = City.city_information(city_obj)
-holiday_info = City.get_holiday_api(city_obj)
-holiday_list = []
+counter = 1  # Räknare för om inmatning av stad ska startas
+# Om en stad är sparad i city.json så läses den in
+try:
+    city_obj.input_city = city[0]
+    # Ritar up UI för första körningen
+    ui.clear()
+    ui.line()
+    ui.header("CITY DATA")
+    ui.line()
+except IndexError:
+    counter = 0
 
-# Resultatet från sökningen skrivs ut
-print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
-print(f'The population of {city_obj.city_name} is {city_obj.population:,}.')
-print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude {city_obj.longitude}.')
-print(f'\n*** Major holidays 2023 in {city_obj.country} ***\n')
+while True:
+    # UI
+    ui.clear()
+    ui.line()
+    ui.header("CITY DATA")
+    ui.line()
+    # Om ingen stad finns sparad från huvudmenyn, skriv in en manuellt
+    if counter < 1:
+        # Startar gränsnittet och inmatning av stad
+        City.city_start()
+    counter = 0  # Räknaren nollställs så att manuell inmatning av stad sker nästa gång loopen körs
 
-# Loop som sparar dictionaryt i en lista efter datum och namn
-for i in holiday_info:
-    holiday_list.append([i['date'], i['name']])
+    # Hämtar data från API:erna city och holiday
+    City.city_information(city_obj)
+    holiday_info = City.get_holiday_api(city_obj)
+    holiday_list = []
 
-    # Helgdagslistan sorteras i datumordning och skrivs sedan ut
-holiday_list.sort(key=lambda item: item[0])
-for holiday in holiday_list:
-    print(holiday[0], holiday[1])
+    # Resultatet från sökningen skrivs ut
+    print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
+    print(f'The population of {city_obj.city_name} is {city_obj.population:,}.')
+    print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude {city_obj.longitude}.')
+
+    ui.line()
+    print(f'Press 1 to show major holidays in {city_obj.country}')
+    print('Press 2 to search for another city')
+    print('Press 3 to return to main menu')
+    menu = input(':> ')
+
+    if menu == '1':
+        print(f'\n| Major holidays 2023 in {city_obj.country} |\n')
+
+        # Loop som sparar dictionaryt i en lista efter datum och namn
+        for i in holiday_info:
+            holiday_list.append([i['date'], i['name']])
+
+        # Helgdagslistan sorteras i datumordning och skrivs sedan ut
+        holiday_list.sort(key=lambda item: item[0])
+        for holiday in holiday_list:
+            print(holiday[0], holiday[1])
+
+    elif menu == '2':
+        ui.line()
+        ui.clear()
+        continue
+    elif menu == '3':
+        break
+
+
 
