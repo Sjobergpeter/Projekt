@@ -1,7 +1,7 @@
 import ui
 
 while True:
-    val = input("Välj en siffra ")
+    val = input("Välj en siffra ")  # Detta val ska sparas
     ui.line()
     if val == "1":
         import worldtime
