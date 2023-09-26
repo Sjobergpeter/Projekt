@@ -18,10 +18,12 @@ if os.path.isfile("city.json"):
 
 class City:
     # Konstruktor för nya objekt av klassen
-    def __init__(self, city_name='', capital='', country='', population=0, latitude=0.0, longitude=0.0, input_city=''):
+    def __init__(self, city_name='', capital='', country='', population=0, latitude=0.0, longitude=0.0, input_city='',
+                 country_code=''):
         self.city_name = city_name
         self.capital = capital
         self.country = country
+        self.country_code = country_code
         self.population = population
         self.latitude = latitude
         self.longitude = longitude
@@ -43,23 +45,10 @@ class City:
     # Metod för att hämta holiday information från API
     @staticmethod
     def get_holiday_api(self):
-        city_dict = City.get_city_api(city_obj)
-        try:
-            country = city_dict[0]["country"]
-        except IndexError:
-            print('No country found')
-            return
-        except ValueError:
-            print('ValueError exception occured')
-            return
-        except Exception as e:
-            # Hanterar alla andra undantag
-            print("An unknown exception occured:", e)
-            return
+        country = self.country_code
         year = '2023'
         holiday_name = 'major_holiday'
-        api_url = 'https://api.api-ninjas.com/v1/holidays?country={}&year={}&type={}'.format(country, year,
-                                                                                             holiday_name)
+        api_url = f'https://api.api-ninjas.com/v1/holidays?country={country}&year={year}&type={holiday_name}'
         response = requests.get(api_url, headers={'X-Api-Key': '90lkoFCGJZryQ+TsMHlFTA==akrnZyMBsML9wyo9'})
         if response.status_code == requests.codes.ok:
             response_dict = json.loads(response.text)
@@ -92,6 +81,7 @@ class City:
         try:
             c_code_to_name = pycountry.countries.get(alpha_2=city_dict[0]["country"])
             self.country = c_code_to_name.name
+            self.country_code = city_dict[0]["country"]
         except AttributeError:
             self.country = city_dict[0]["country"]
 
@@ -102,15 +92,36 @@ class City:
 
     @staticmethod
     def your_favorite():
-        ui.echo("Your favorite places:")
-
         if not favorites:
-            ui.echo("No favorite is saved right now")
+            ui.prompt("You dont have any favorite cities saved, press enter to continue")
 
-        for i in favorites:
-            ui.echo(i)
+        else:
+            for i in favorites:
+                city_obj.city_name = i
+                City.get_city_api(city_obj)
+                print(f'{i} is a city in {city_obj.country}')
+                ui.line()
+            ui.prompt("Press enter to continue")
 
-        ui.line()
+    @staticmethod
+    def delete_favorites():
+        if not favorites:
+            ui.prompt("You dont have have favorite cities to remove, press enter to continue")
+            return
+        ui.header("Your favorites right now:")
+        for n in favorites:
+            ui.echo(n)
+
+        delete = ui.prompt("What city do you want to remove?")
+
+        if delete in favorites:
+            favorites.remove(delete)
+            with open("favorites.json", "w+") as file:
+                json.dump(favorites, file)
+
+            ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
+        else:
+            ui.prompt(f"{delete} doesn't exist in favorites, press enter to continue")
 
     # Metod som startar sökning av stad, utskrift av info & helgdagar & spara favorit
     @staticmethod
@@ -132,15 +143,22 @@ class City:
         if holidays == 'yes':
             print(f'\n| Major holidays 2023 in {city_obj.country} |\n')
 
-            # Loop som sparar dictionaryt i en lista efter datum och namn
-            for i in holiday_info:
-                holiday_list.append([i['date'], i['name']])
+            try:
+                # Loop som sparar dictionaryt i en lista efter datum och namn
+                for i in holiday_info:
+                    holiday_list.append([i['date'], i['name']])
 
-            # Helgdagslistan sorteras i datumordning och skrivs sedan ut
-            holiday_list.sort(key=lambda item: item[0])
-            for holiday in holiday_list:
-                print(holiday[0], holiday[1])
+                # Helgdagslistan sorteras i datumordning och skrivs sedan ut
+                holiday_list.sort(key=lambda item: item[0])
+                for holiday in holiday_list:
+                    print(holiday[0], holiday[1])
 
+            except TypeError:
+                print('Something went wrong')
+            except Exception as e:
+                # Hanterar alla andra undantag
+                print("An unknown exception occured:", e)
+                            
         ui.line()
         # Låter användaren spara sin favorit
         favorit = ui.prompt("Do you want to save this city as your favorite? (y/n)").lower()
@@ -188,7 +206,7 @@ ui.clear()
 
 # Huvudprogrammet med menyfunktion
 while True:
-    # UI
+    # UI utskrift
     ui.clear()
     ui.line()
     ui.header("CITY DATA")
@@ -216,14 +234,11 @@ while True:
         # Sökmetoden anropas
         City.city_start()
 
-    # Listar favoritstäder
     elif menu == '2':
         City.your_favorite()
 
     elif menu == '3':
-        ui.line()
-        ui.clear()
-        continue
+        City.delete_favorites()
 
     elif menu == '4':
         break
