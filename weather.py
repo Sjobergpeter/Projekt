@@ -1,30 +1,38 @@
 import requests
 import datetime
+import json
+import os
 
-city = input("Enter a city: ")
-api_url = 'https://api.api-ninjas.com/v1/weather?city={}'.format(city)
+# Gets the chosen city from city.json
+main_input = ""
+with open ("city.json", "r") as myFile:
+    main_input = myFile.read()
+    main_input = json.loads(main_input)
+city = main_input[0]
+
+# city = input("Enter a city: ")
+api_url = f'https://api.api-ninjas.com/v1/weather?city={city}'
 response = requests.get(api_url, headers={'X-Api-Key': 'dYoSBiEQ2LdY439GrifdSw==7OgS2qGCvv1GiXs8'})
-if response.status_code == requests.codes.ok:
-    weather = response.json()
-    print (weather)
 
-else:
-    print("Error:", response.status_code, response.text)
+if response.status_code != requests.codes.ok:
+    print("Could not fetch the weather from", city)
+    input("Press Enter to continue")
 
 def weather_cloud():
+    coverage = ""
+    
     if weather['cloud_pct'] > 30 and weather['cloud_pct'] < 60:
-        print ("It's partially cloudy in", city,)
+        coverage = "partially cloudy"
     elif weather['cloud_pct'] >= 60:
-        print (f"It's cloudy in {city} with a cloud coverage of {weather['cloud_pct']}%")
+        coverage = "cloudy"
     else:
-        print ("It's sunny in", city)
+        coverage = "sunny"
+    print (f"It's {coverage} in {city.capitalize()} with a cloud coverage of {weather['cloud_pct']}%")
 
 def weather_temp():
     if weather['temp'] != weather["feels_like"]:
         print (f"the temperature is currently at {weather['temp']}°C but feels like {weather['feels_like']} °C")
-    else:
-        
-        
+    else: 
         print (f"the temperature is currently at {weather['temp']}°C")
     print (f"The temperature range today will be between {weather['min_temp']}°C and {weather['max_temp']}°C")
 
@@ -44,21 +52,71 @@ def weather_sun():
     sunrise_datetime = datetime.datetime.utcfromtimestamp(sunrise_timestamp)
     sunset_datetime = datetime.datetime.utcfromtimestamp(sunset_timestamp)
 
-    print(f"Today the sun rises in {city} at {sunrise_datetime.strftime('%H:%M')} (UTC) and sets at {sunset_datetime.strftime('%H:%M')}")
-    
+    print(f"Today the sun rises in {city.capitalize()} at {sunrise_datetime.strftime('%H:%M')} (UTC) and sets at {sunset_datetime.strftime('%H:%M')}")
 
-weather_cloud()
-print("-"*62)
-weather_temp()
-print("-"*62)
-weather_wind()
-print("-"*62)
-weather_humid()
-print("-"*62)
-weather_sun()
+if response.status_code == requests.codes.ok:
+    weather = response.json()
+    while True:  
+        os.system("cls") if os.name == "nt" else os.system("clear")
 
+        print(".:     Weather Analyzer     :.")
+        print("-" * 30)
+        print("""| 1 | Cloud
+| 2 | Temperature
+| 3 | Wind
+| 4 | Humidity
+| 5 | Sun forecast
+| 6 | All of the above
+| 7 | Exit Weather Analyzer""")
+        print ("-" * 30)
+        print("Type the number for the alternative")
+        user_input = input("you wish to know more about: ")
+        os.system("cls") if os.name == "nt" else os.system("clear")
+        print(".:     Weather Analyzer     :.")
+        print("-" * 30)
 
+        if user_input == "1":
+            weather_cloud()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "2":
+            weather_temp()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "3":
+            weather_wind()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "4":
+            weather_humid()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "5":
+            weather_sun()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "6":
+            weather_cloud()
+            print("-" * 30)
+            weather_temp()
+            print("-" * 30)
+            weather_wind()
+            print("-" * 30)
+            weather_humid()
+            print("-" * 30)
+            weather_sun()
+            print("-" * 30)
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "6":
+            weather_temp()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "7":
+            break
+        else:
+            print("Invalid input")
+            input("Press Enter to continue")
+            continue
 
 # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
-
-# hejdå
