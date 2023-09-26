@@ -97,9 +97,9 @@ class City:
 
         else:
             for i in favorites:
-                city_obj.city_name = i
-                City.get_city_api(city_obj)
-                print(f'{i} is a city in {city_obj.country}')
+                city_obj.input_city = i
+                City.city_information(city_obj)
+                print(f'{i} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
                 ui.line()
             ui.prompt("Press enter to continue")
 
@@ -201,7 +201,7 @@ print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.ca
 print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
 print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude\n{city_obj.longitude}.')
 ui.line()
-input('> Press Enter to continue')
+input('> Press Enter to continue\n')
 ui.clear()
 
 # Huvudprogrammet med menyfunktion
