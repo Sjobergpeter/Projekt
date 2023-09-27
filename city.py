@@ -4,18 +4,13 @@ import ui
 import pycountry
 import requests
 
-# Listor som sparar favoritstäder och sökt stad från huvudmenyn
+# Lista som sparar favoritstäder
 favorites = []
-city = []
 
-# Filer för favoritstäder och sökt stad läses in
+# Filer för favoritstäder  läses in
 if os.path.isfile("favorites.json"):
     with open("favorites.json", "r") as f:
         favorites = json.load(f)
-
-if os.path.isfile("city.json"):
-    with open("city.json", "r") as f:
-        city = json.load(f)
 
 
 # Klassen hanterar all information som reurneras från API:et
@@ -189,71 +184,88 @@ class City:
         else:
             input("ERROR!")
 
+    # Metod som anropas från huvudmenyn och returnerar city information
+    @staticmethod
+    def startprogram():
+        # Om en stad är sparad i city.json så läses den in vid start
+        if os.path.isfile("city.json"):
+            with open("city.json", "r") as file:
+                city_in = json.load(file)
 
-# - Huvudprogrammet startar -
+        # Kontroll att det finns något sparat i city.json
+        if len(city_in) > 0:
+            city_obj.input_city = city_in
+            # Ritar up UI för första körningen
+            City.city_information(city_obj)
+            ui.clear()
+            ui.line()
+            ui.header("CITY DATA")
+            ui.line()
+            # Resultatet från sökningen skrivs ut
+            print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
+            print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
+            print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude\n{city_obj.longitude}.')
+            ui.line()
+            input('> Press Enter to continue\n')
+            City.main()
+        else:
+            print('Error, the city is not in the database')
+            input('> Press Enter to continue\n')
+            # Huvudmetoden anropas
+            City.main()
+
+    # - Huvudprogrammet startar -
+    @staticmethod
+    def main():
+        # Huvudprogrammets menyfunktion
+        while True:
+            # UI utskrift
+            ui.clear()
+            ui.line()
+            ui.header("CITY DATA")
+            ui.line()
+            ui.echo("Your favorite places:")
+            if not favorites:
+                ui.echo("No favorite is saved right now")
+
+            for favorite in favorites:
+                ui.echo(favorite)
+
+            ui.line()
+            ui.line()
+            ui.header("Choose an option")
+            ui.line()
+            print('1 | Search for a city')
+            print('2 | Lookup your favorite/s')
+            print('3 | Delete a favorite')
+            print('4 | return to main menu')
+            ui.line()
+            menu = input(':> ')
+
+            # Inmatning av menyval
+            if menu == '1':
+                # Sökmetoden anropas
+                City.city_start()
+
+            elif menu == '2':
+                # Favoritmetoden anropas
+                City.your_favorite()
+
+            elif menu == '3':
+                # Ta bort favorit anropas
+                City.delete_favorites()
+
+            elif menu == '4':
+                # Avsluta och återgå till huvudmenyn
+                break
+
+            else:
+                continue
+
+
 # Skapar objektet som innehåller variabler om efterfrågad stad
 city_obj = City()
 
-# Om en stad är sparad i city.json så läses den in vid start
-if len(city) > 0:
-    city_obj.input_city = city[0]
-    # Ritar up UI för första körningen
-    City.city_information(city_obj)
-    ui.clear()
-    ui.line()
-    ui.header("CITY DATA")
-    ui.line()
-    # Resultatet från sökningen skrivs ut
-    print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
-    print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
-    print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude\n{city_obj.longitude}.')
-    ui.line()
-    input('> Press Enter to continue\n')
-    ui.clear()
-else:
-    print('Error, the city is not in the database')
-
-# Huvudprogrammets menyfunktion
-while True:
-    # UI utskrift
-    ui.clear()
-    ui.line()
-    ui.header("CITY DATA")
-    ui.line()
-    ui.echo("Your favorite places:")
-    if not favorites:
-        ui.echo("No favorite is saved right now")
-
-    for favorite in favorites:
-        ui.echo(favorite)
-
-    ui.line()
-    ui.line()
-    ui.header("Choose an option")
-    ui.line()
-    print('1 | Search for a city')
-    print('2 | Lookup your favorite/s')
-    print('3 | Delete a favorite')
-    print('4 | return to main menu')
-    ui.line()
-    menu = input(':> ')
-
-    # Inmatning av menyval
-    if menu == '1':
-        # Sökmetoden anropas
-        City.city_start()
-
-    elif menu == '2':
-        # Favoritmetoden anropas
-        City.your_favorite()
-
-    elif menu == '3':
-        # Ta bort favorit anropas
-        City.delete_favorites()
-
-    elif menu == '4':
-        # Avsluta och återgå till huvudmenyn
-        break
-
-    else:
-        continue
+# Om programmet körs fristående startas main metoden härifrån
+if __name__ == "__main__":
+    City.main()
