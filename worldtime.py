@@ -3,16 +3,15 @@ import ui
 import json
 import os
 
-# Test
-
 favorites = []
 
-# Antons-branch test
+# -- JSON -- #
+# Hämtar och tilldelar city till city_choice
+if os.path.isfile("city.json"):
+    with open("city.json", "r") as f:
+        city_choice = json.load(f)
 
-with open("city.json", "r") as f:
-    city_choice = json.load(f)
-
-
+# Hämtar och tilldelar favorites till favorites
 if os.path.isfile("favorites.json"):
     with open("favorites.json", "r") as f:
         favorites = json.load(f)
@@ -41,6 +40,27 @@ def get_api(city):
     response = requests.get(url, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
     response_dict = json.loads(response.text)
     return response_dict
+
+
+# Funktion för att kolla så city finns i API (felhantering)
+# https://www.w3schools.com/python/ref_requests_response.asp
+# 200 = ok
+def city_exist(city):
+    url = f'https://api.api-ninjas.com/v1/worldtime?city={city}'
+    response = requests.get(url, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
+
+    if response.status_code == 200:
+        return True
+
+    else:
+        return False
+
+
+# Behöver komma åt denna utanför funktionen, så använder global
+# https://www.w3schools.com/python/python_variables_global.asp
+def get_city_choice(city):
+    global city_choice  # Använd global för att ändra den globala variabeln
+    city_choice = city
 
 
 # Formaterar datum till rätt format
@@ -82,7 +102,7 @@ def city_information(city):
     }
 
 
-# Def för utskrift
+# Funktion för utskrift
 def print_city_info(city_info):
     ui.line()
     ui.echo(f"The city {city_info['city']} is in the timezone of {city_info['timezone']}.")
@@ -91,7 +111,7 @@ def print_city_info(city_info):
 
 
 # -- FUNKTIONER FÖR ALLA VAL -- #
-# Val 1
+# Val 1 - Allmän info
 def new_city():
     city_info = city_information(city_choice)
 
@@ -100,46 +120,49 @@ def new_city():
 
     ui.line()
     # Låter användaren spara sin favorit
-    favorit = ui.prompt("Do you want to save this city as your favorite? (j/n)").lower()
+    favorit = ui.prompt("Do you want to save this city as your favorite? (y/n)").lower()
+    while True:
+        if favorit == "y":
+            favorites.append(city_info['city'])
 
-    if favorit == "j":
-        favorites.append(city_info['city'])
+            with open("favorites.json", "w+") as b:
+                json.dump(favorites, b)
 
-        with open("favorites.json", "w+") as b:
-            json.dump(favorites, b)
+            ui.prompt(f"You chose to save {city_choice} as a favorite, press enter to continue")
+            break
 
-        ui.prompt(f"You chose to save {city_choice} as a favorite, press enter to continue")
+        elif favorit == "n":
+            ui.prompt(f"You chose to not save {city_choice} as a favorite, press enter to continue")
+            break
 
-    elif favorit == "n":
-
-        ui.prompt(f"You chose to not save {city_choice} as a favorite, press enter to continue")
-
-    else:
-        input("ERROR!")
+        else:
+            favorit = ui.prompt("You need to type yes or no (y/n)")
 
 
-# Val 2
+# Val 2 - Jämföra städer
 def compare_cities():
     # Välj en stad att jämföra mot
     city1 = ui.prompt("Choose a city to compare timezone with")
     # city2 = ui.prompt("Enter the second city")
+    if city_exist(city1):
+        # Hämtar information om bägge städerna
+        city1_info = city_information(city1)
+        city2_info = city_information(city_choice)
 
-    # Hämtar information om bägge städerna
-    city1_info = city_information(city1)
-    city2_info = city_information(city_choice)
+        # För att ta fram endast positivt tal används abs
+        # https://www.w3schools.com/python/ref_func_abs.asp
+        time_difference = abs(int(city1_info['hour']) - int(city2_info['hour']))
 
-    # För att ta fram endast positivt tal används abs
-    # https://www.w3schools.com/python/ref_func_abs.asp
-    time_difference = abs(int(city1_info['hour']) - int(city2_info['hour']))
-
-    # Skriv ut tidsskillnaden i timmar
-    ui.line()
-    ui.echo(f"The time difference between {city1} and {city_choice} is {time_difference} hours")
-    ui.line()
-    ui.prompt("Press enter to continue")
+        # Skriv ut tidsskillnaden i timmar
+        ui.line()
+        ui.echo(f"The time difference between {city1} and {city_choice} is {time_difference} hours")
+        ui.line()
+        ui.prompt("Press enter to continue")
+    else:
+        ui.prompt(f"{city1} does not exist, press enter to continue")
 
 
-# Val 3
+# Val 3 - Kolla upp favoriter
 def lookup_favorites():
     if not favorites:
         ui.prompt("You dont have any favorite cities saved, press enter to continue")
@@ -151,12 +174,8 @@ def lookup_favorites():
         ui.line()
         ui.prompt("Press enter to continue")
 
-        # Loopa igenom allt
-        # Lägg in ny stad varje loop
-        # Använd print_city_info för utskrift
 
-
-# Val 4
+# Val 4 - Ta bort favoriter
 def delete_favorites():
     if not favorites:
         ui.prompt("You dont have have favorite cities to remove, press enter to continue")
@@ -174,48 +193,52 @@ def delete_favorites():
 
         ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
     else:
-        ui.prompt(f"{delete} doesnt exist in the favorites, press enter toc ontinue")
+        ui.prompt(f"{delete} doesnt exist in the favorites, press enter to continue")
 
 
 # -- PROGRAMMET -- #
-while True:
-    # UI
-    ui.clear()
-    ui.line()
-    ui.header("WORLD TIMES")
-    ui.line()
-    ui.echo("Your favorite places:")
+def main(city_choice):
+    if city_exist(city_choice):
+        while True:
+            # UI
+            ui.clear()
+            ui.line()
+            ui.header("WORLD TIMES")
+            ui.line()
+            ui.echo("Your favorite places:")
 
-    if not favorites:
-        ui.echo("No favorite is saved right now")
+            if not favorites:
+                ui.echo("No favorite is saved right now")
 
-    for favorite in favorites:
-        ui.echo(favorite)
+            for favorite in favorites:
+                ui.echo(favorite)
 
-    ui.line()
-    ui.header("Choose an option")
-    ui.line()
-    ui.echo("1 - Check time and date about the city")
-    ui.echo("2 - Compare with another city")
-    ui.echo("3 - Lookup your favorite/s")
-    ui.echo("4 - Delete a favorite")
-    ui.echo("5 - Exit")
-    ui.line()
+            ui.line()
+            ui.header("Choose an option")
+            ui.line()
+            ui.echo("1 - Check time and date about the city")
+            ui.echo("2 - Compare timezone with another city")
+            ui.echo("3 - Lookup your favorite/s")
+            ui.echo("4 - Delete a favorite")
+            ui.echo("5 - Back to main menu")
+            ui.line()
 
-    # Användaren får ett val
-    choice = ui.prompt("Type your choice")
-    ui.line()
+            # Användaren får ett val
+            choice = ui.prompt("Type your choice")
+            ui.line()
 
-    # Kollar upp en ny stad
-    if choice == "1":
-        new_city()
-    elif choice == "2":
-        compare_cities()
-    elif choice == "3":
-        lookup_favorites()
-    elif choice == "4":
-        delete_favorites()
-    elif choice == "5":
-        break
+            # Kollar upp en ny stad
+            if choice == "1":
+                new_city()
+            elif choice == "2":
+                compare_cities()
+            elif choice == "3":
+                lookup_favorites()
+            elif choice == "4":
+                delete_favorites()
+            elif choice == "5":
+                break
+            else:
+                ui.prompt("You did not pick a correct choice, press enter to try again...")
     else:
-        ui.prompt("You did not pick a correct choice, press enter to try again...")
+        ui.prompt("The city you entered doesnt exist, press enter to go back to the main menu")
