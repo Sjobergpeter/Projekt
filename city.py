@@ -219,6 +219,9 @@ class City:
     def main():
         # Huvudprogrammets menyfunktion
         while True:
+            if os.path.isfile("favorites.json"):
+                with open("favorites.json", "r") as f:
+                    favorites = json.load(f)
             # UI utskrift
             ui.clear()
             ui.line()
