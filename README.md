@@ -8,8 +8,13 @@ För att köra City Picker behöver du installera några Python-moduler. Öppna 
 
 ```bash
 pip install pytz requests pycountry
+```
 
 ## Användning
 
-När du har installerat de nödvändiga modulerna kan du köra huvudprogrammet, main.py. Använd följande kommando:
+När du har installerat de nödvändiga modulerna kan du köra huvudprogrammet, main.py. Använd följande kommando för att köra programmet:
+```
 python main.py
+```
+
+Programmet kommer att be dig ange en stad och sedan välja mellan fyra val som ger dig information om staden du angett.
