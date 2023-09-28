@@ -7,6 +7,8 @@ import Weather
 import city
 import aqi
 
+favorites = []
+
 
 # Funktion för att skriva ut favoriter
 def check_favorites():
@@ -47,7 +49,8 @@ while True:
     ui.line()
 
     # Användaren väljer en stad
-    choose_city = ui.prompt("Pick a city or type 5 to exit")
+    ui.echo("Type a city or 5 to exit" + "|".rjust(4))
+    choose_city = ui.prompt("")
 
     # Användaren kan välja att stänga programmet tidigt
     if choose_city == "5":
