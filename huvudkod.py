@@ -49,7 +49,7 @@ while True:
 
     # Global variabel som tilldelar choose_city till variabel i worldtime.py
     worldtime.get_city_choice(choose_city)
-    aqi.get_air_quality(choose_city)
+    aqi.get_city_choice(choose_city)
     ui.line()
 
     # Användaren får välja info som ska tas fram
