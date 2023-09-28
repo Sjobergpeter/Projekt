@@ -7,22 +7,24 @@ import Weather
 import city
 import aqi
 
+
+# Funktion för att skriva ut favoriter
 def check_favorites():
     if not favorites:
-        ui.echo("No favorites saved yet")
+        ui.echo("No favorites saved yet" + "|".rjust(6))
 
     else:
+        ui.echo("Your current favorites:" + "|".rjust(5))
         for favorite in favorites:
             ui.echo(favorite)
 
-favorites = []
-
-if os.path.isfile("favorites.json"):
-    with open("favorites.json", "r") as f:
-        favorites = json.load(f)
 
 # Huvudprogrammet som körs
 while True:
+    # Läser av favoriter
+    if os.path.isfile("favorites.json"):
+        with open("favorites.json", "r") as f:
+            favorites = json.load(f)
 
     # UI
     ui.clear()
@@ -30,8 +32,10 @@ while True:
     ui.header("CITY PICKER 1.0")
     ui.line()
 
+    # Hämtar funktion
     check_favorites()
 
+    # Menyval
     ui.line()
     ui.echo("1 | Time and Date" + "|".rjust(11))
     ui.echo("2 | Air Quality Index" + "|".rjust(7))
@@ -43,11 +47,16 @@ while True:
     # Användaren väljer en stad
     choose_city = ui.prompt("Pick a city")
 
+    # Användaren kan välja att stänga programmet tidigt
+    if choose_city == "5":
+        ui.echo("You exited the program")
+        exit()
+
     # Sparar valet i city.json
     with open("city.json", "w+") as f:
         f.write(json.dumps(choose_city))
 
-    # Global variabel som tilldelar choose_city till variabel i worldtime.py
+    # Globala variablar som tilldelar choose_city
     worldtime.get_city_choice(choose_city)
     aqi.get_city_choice(choose_city)
     ui.line()
