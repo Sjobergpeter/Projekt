@@ -269,3 +269,5 @@ city_obj = City()
 # Om programmet körs fristående startas main metoden härifrån
 if __name__ == "__main__":
     City.main()
+
+# Hej
