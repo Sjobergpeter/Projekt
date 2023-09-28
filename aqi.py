@@ -58,10 +58,15 @@ def json_delete():
         print("City not found in favorites.")
 
 
+def get_city_choice(city):
+    global city_choice
+    city_choice = city
+
+
 def main():
     while True:
 
-        city_choice = input("Enter a city name: ").lower()
+        """city_choice = input("Enter a city name: ").lower()"""
         print("-" * 30)
 
         print("1 - air quality information")
