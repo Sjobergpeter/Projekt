@@ -2,8 +2,15 @@ import requests
 import datetime
 import json
 import os
+import pytz
 
 def main():
+    main_input = ""
+    with open ("city.json", "r") as myFile:
+        main_input = myFile.read()
+        main_input = json.loads(main_input)
+    city = main_input
+
     def weather_cloud():
         coverage = ""
         
@@ -32,21 +39,19 @@ def main():
         print (F"There's a {cardinal} wind at {weather['wind_speed']} meters per second")
 
     def weather_sun():
+        urlzone = f'https://api.api-ninjas.com/v1/worldtime?city={city}'
+        response = requests.get(urlzone, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
+        response_dict = json.loads(response.text)
+        timezone_str = response_dict['timezone']
+        timezone = pytz.timezone(timezone_str)
         sunrise_timestamp = weather['sunrise']
         sunset_timestamp = weather['sunset']
+        utc_datetime = datetime.datetime.utcfromtimestamp(sunrise_timestamp)
+        local_sunrise = utc_datetime.replace(tzinfo=pytz.utc).astimezone(timezone)
+        utc_datetime = datetime.datetime.utcfromtimestamp(sunset_timestamp)
+        local_sunset = utc_datetime.replace(tzinfo=pytz.utc).astimezone(timezone)
+        print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} (UTC) and sets at {local_sunset.strftime('%H:%M')}")
 
-        sunrise_datetime = datetime.datetime.utcfromtimestamp(sunrise_timestamp)
-        sunset_datetime = datetime.datetime.utcfromtimestamp(sunset_timestamp)
-
-        print(f"Today the sun rises in {city.capitalize()} at {sunrise_datetime.strftime('%H:%M')} (UTC) and sets at {sunset_datetime.strftime('%H:%M')}")
-    # Gets the chosen city from city.json
-    main_input = ""
-    with open ("city.json", "r") as myFile:
-        main_input = myFile.read()
-        main_input = json.loads(main_input)
-    city = main_input
-
-    # city = input("Enter a city: ")
     api_url = f'https://api.api-ninjas.com/v1/weather?city={city}'
     response = requests.get(api_url, headers={'X-Api-Key': 'dYoSBiEQ2LdY439GrifdSw==7OgS2qGCvv1GiXs8'})
 
@@ -62,12 +67,12 @@ def main():
             print(".:     Weather Analyzer     :.")
             print("-" * 30)
             print("""| 1 | Cloud
-    | 2 | Temperature
-    | 3 | Wind
-    | 4 | Humidity
-    | 5 | Sun forecast
-    | 6 | All of the above
-    | 7 | Exit Weather Analyzer""")
+| 2 | Temperature
+| 3 | Wind
+| 4 | Humidity
+| 5 | Sun forecast
+| 6 | All of the above
+| 7 | Exit Weather Analyzer""")
             print ("-" * 30)
             print("Type the number for the alternative")
             user_input = input("you wish to know more about: ")
@@ -119,6 +124,4 @@ def main():
                 input("Press Enter to continue")
                 continue
 
-    # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
-
-    # hej
+#     # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
