@@ -99,7 +99,8 @@ class City:
     @staticmethod
     def your_favorite():
         if not favorites:
-            ui.prompt("You dont have any favorite cities saved, press enter to continue")
+            ui.echo("No favorite cities saved.")
+            ui.prompt("Press enter to continue")
 
         else:
             for i in favorites:
@@ -115,7 +116,8 @@ class City:
     @staticmethod
     def delete_favorites():
         if not favorites:
-            ui.prompt("You dont have have favorite cities to remove, press enter to continue")
+            ui.echo("No favorite cities to remove!")
+            ui.prompt("Press enter to continue")
             return
         ui.header("Your favorites right now:")
         for n in favorites:
@@ -128,9 +130,11 @@ class City:
             with open("favorites.json", "w") as file:
                 json.dump(favorites, file)
 
-            ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
+            ui.echo(f"{delete} has been removed from favorites.")
+            ui.prompt("Press enter to continue")
         else:
-            ui.prompt(f"{delete} doesn't exist in favorites, press enter to continue")
+            ui.echo(f"{delete} doesn't exist in favorites.")
+            ui.prompt("Press enter to continue")
 
     # Metod som startar sökning av stad, utskrift av city info, helgdagar & spara favorit
     @staticmethod
@@ -170,7 +174,7 @@ class City:
 
         ui.line()
         # Låter användaren spara sin favorit
-        favorit = ui.prompt("Do you want to save this city as your favorite? (y/n)").lower()
+        favorit = ui.prompt("Do you want to save this\n| city as your favorite? (y/n)").lower()
 
         if favorit == "y":
             favorites.append(city_obj.city_name)
@@ -178,11 +182,13 @@ class City:
             with open("favorites.json", "w+") as b:
                 json.dump(favorites, b)
 
-            ui.prompt(f"You chose to save {city_obj.city_name} as a favorite, press enter to continue")
+            ui.echo(f"{city_obj.city_name} saved as a favorite.")
+            ui.prompt("Press enter to continue")
 
         elif favorit == "n":
 
-            ui.prompt(f"You chose not to save {city_obj.city_name} as a favorite, press enter to continue")
+            ui.echo(f"{city_obj.city_name} not saved as a favorite.")
+            ui.prompt("Press enter to continue")
 
         else:
             input("ERROR!")
