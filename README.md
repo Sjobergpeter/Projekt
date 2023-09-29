@@ -1,3 +1,4 @@
+=======
 # City Picker
 
 City Picker är ett enkelt Python-program som låter användare hämta information om städer över hela världen genom API:er från [API-Ninjas]([http://www.apininja.com](https://api-ninjas.com/)).
@@ -18,3 +19,4 @@ python main.py
 ```
 
 Programmet kommer att be dig ange en stad och sedan välja mellan fyra val som ger dig information om staden du angett.
+>>>>>>> af4d4ffdcd22ffc4cb0ae406d26100ff7b086530

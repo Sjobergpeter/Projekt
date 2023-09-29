@@ -36,9 +36,8 @@ def print_aqi(aqi_info):
 def print_aqi_list(aqi_info_dictionary):
     for info_name, info_value in aqi_info_dictionary.items():
         if type(info_value) is dict:
-            print("", info_name)
             aqi = info_value["aqi"]
-            print(f"This is the overall aqi index: {aqi}")
+            print(f"This is the overall aqi index levels: {aqi} for {info_name}")
 
 
 def json_favorite():
@@ -82,7 +81,6 @@ def get_city_choice(city):
 def main():
     get_city_choice(city_choice)
     while True:
-        """city_choice = input("Enter a city name: ").lower()"""
         print(city_choice.capitalize().center(30))
         print("-" * 30)
         print("1 - air quality information")
@@ -91,6 +89,7 @@ def main():
         print("4 - delete a favorite")
         print("5 - Exit")
         print("-" * 30)
+
         menu_choice = input("Choose an option: ")
 
         aqi_info = get_air_quality(city_choice)
