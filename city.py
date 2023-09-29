@@ -7,11 +7,6 @@ import requests
 # Lista som sparar favoritstäder
 favorites = []
 
-# Filer för favoritstäder  läses in
-if os.path.isfile("favorites.json"):
-    with open("favorites.json", "r") as f:
-        favorites = json.load(f)
-
 
 # Klassen hanterar all information som reurneras från API:et
 class City:
@@ -29,9 +24,8 @@ class City:
         self.input_city = input_city
 
     # Metod för att hämta city information från API
-    @staticmethod
     def get_city_api(self):
-        city_in = city_obj.input_city
+        city_in = self.input_city
         url = f'https://api.api-ninjas.com/v1/city?name={city_in}'
         response = requests.get(url, headers={'X-Api-Key': '90lkoFCGJZryQ+TsMHlFTA==akrnZyMBsML9wyo9'})
         if response.status_code == requests.codes.ok:
@@ -42,7 +36,6 @@ class City:
             return
 
     # Metod för att hämta holiday information från API
-    @staticmethod
     def get_holiday_api(self):
         country = self.country_code
         year = '2023'
@@ -94,7 +87,15 @@ class City:
             print('Not found')
             return self
 
-    # Metod som hanterar favoriter
+    # Metoder som hanterar favoriter
+    @staticmethod
+    def load_favorites():
+        global favorites
+        # Fil för favoritstäder läses in
+        if os.path.isfile("favorites.json"):
+            with open("favorites.json", "r") as f:
+                favorites = json.load(f)
+
     @staticmethod
     def your_favorite():
         if not favorites:
@@ -102,7 +103,9 @@ class City:
 
         else:
             for i in favorites:
+                # Favoritstaden sätts till .input_city
                 city_obj.input_city = i
+                # Cityobjektet skickas till API
                 City.city_information(city_obj)
                 print(f'{i} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
                 ui.line()
@@ -122,7 +125,7 @@ class City:
 
         if delete in favorites:
             favorites.remove(delete)
-            with open("favorites.json", "w+") as file:
+            with open("favorites.json", "w") as file:
                 json.dump(favorites, file)
 
             ui.prompt(f"{delete} has been removed from favorites, press enter to continue")
@@ -184,7 +187,8 @@ class City:
         else:
             input("ERROR!")
 
-    # Metod som anropas från huvudmenyn och returnerar city information
+    # Metod som anropas från huvudmenyn och returnerar city information.
+    # Körs första gången sedan körs City.main() metoden
     @staticmethod
     def startprogram():
         # Om en stad är sparad i city.json så läses den in vid start
@@ -219,9 +223,8 @@ class City:
     def main():
         # Huvudprogrammets menyfunktion
         while True:
-            if os.path.isfile("favorites.json"):
-                with open("favorites.json", "r") as f:
-                    favorites = json.load(f)
+            # Favoritstäder läses in
+            City.load_favorites()
             # UI utskrift
             ui.clear()
             ui.line()
@@ -272,5 +275,3 @@ city_obj = City()
 # Om programmet körs fristående startas main metoden härifrån
 if __name__ == "__main__":
     City.main()
-
-# Hej
