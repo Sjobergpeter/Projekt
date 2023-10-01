@@ -5,17 +5,6 @@ import os
 
 favorites = []
 
-# -- JSON -- #
-# Hämtar och tilldelar city till city_choice
-if os.path.isfile("city.json"):
-    with open("city.json", "r") as f:
-        city_choice = json.load(f)
-
-# Hämtar och tilldelar favorites till favorites
-if os.path.isfile("favorites.json"):
-    with open("favorites.json", "r") as f:
-        favorites = json.load(f)
-
 # Dictionary för att ha alla månader i text istället
 month_number = {
     '01': 'January',
@@ -91,6 +80,7 @@ def city_information(city):
     day_of_week = city_info['day_of_week']
     hour = city_info['hour']
 
+    # Tilldelar detta
     return {
         'city': city,
         'timezone': timezone,
@@ -164,6 +154,14 @@ def compare_cities():
 
 # Val 3 - Kolla upp favoriter
 def lookup_favorites():
+    # Global så den ej endast nås lokalt
+    global favorites
+
+    # Hämtar och tilldelar favorites till favorites
+    if os.path.isfile("favorites.json"):
+        with open("favorites.json", "r") as f:
+            favorites = json.load(f)
+
     if not favorites:
         ui.prompt("You dont have any favorite cities saved, press enter to continue")
 
@@ -198,6 +196,7 @@ def delete_favorites():
 
 # -- PROGRAMMET -- #
 def main(city_choice):
+    # Går in i while-loopen ifall API hittar staden
     if city_exist(city_choice):
         while True:
             # UI
@@ -227,7 +226,7 @@ def main(city_choice):
             choice = ui.prompt("Type your choice")
             ui.line()
 
-            # Kollar upp en ny stad
+            # Tilldelar valen till funktioner
             if choice == "1":
                 new_city()
             elif choice == "2":
