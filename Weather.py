@@ -3,14 +3,15 @@ import datetime
 import json
 import os
 import pytz
+import ui
 
 def main():
-    main_input = ""
-    with open ("city.json", "r") as myFile:
-        main_input = myFile.read()
-        main_input = json.loads(main_input)
-    city = main_input
-
+    def weather_updateCity():
+        with open ("city.json", "r") as myFile:
+            main_input = myFile.read()
+            main_input = json.loads(main_input)
+            return main_input
+        
     def weather_cloud():
         coverage = ""
         
@@ -42,86 +43,163 @@ def main():
         urlzone = f'https://api.api-ninjas.com/v1/worldtime?city={city}'
         response = requests.get(urlzone, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
         response_dict = json.loads(response.text)
+        
         timezone_str = response_dict['timezone']
         timezone = pytz.timezone(timezone_str)
-        sunrise_timestamp = weather['sunrise']
-        sunset_timestamp = weather['sunset']
-        utc_datetime = datetime.datetime.utcfromtimestamp(sunrise_timestamp)
-        local_sunrise = utc_datetime.replace(tzinfo=pytz.utc).astimezone(timezone)
-        utc_datetime = datetime.datetime.utcfromtimestamp(sunset_timestamp)
-        local_sunset = utc_datetime.replace(tzinfo=pytz.utc).astimezone(timezone)
-        print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} (UTC) and sets at {local_sunset.strftime('%H:%M')}")
+        
+        sunrise_utc = datetime.datetime.utcfromtimestamp(weather['sunrise'])
+        sunset_utc = datetime.datetime.utcfromtimestamp(weather['sunset'])
 
-    api_url = f'https://api.api-ninjas.com/v1/weather?city={city}'
-    response = requests.get(api_url, headers={'X-Api-Key': 'dYoSBiEQ2LdY439GrifdSw==7OgS2qGCvv1GiXs8'})
+        local_sunrise = sunrise_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
+        local_sunset = sunset_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
+        
+        print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} and sets at {local_sunset.strftime('%H:%M')}")
 
-    if response.status_code != requests.codes.ok:
-        print("Could not fetch the weather from", city)
-        input("Press Enter to continue")
+    
+    def weather_getdata():
+        api_url = f'https://api.api-ninjas.com/v1/weather?city={city}'
+        response = requests.get(api_url, headers={'X-Api-Key': 'dYoSBiEQ2LdY439GrifdSw==7OgS2qGCvv1GiXs8'})
 
-    if response.status_code == requests.codes.ok:
-        weather = response.json()
-        while True:  
-            os.system("cls") if os.name == "nt" else os.system("clear")
+        if response.status_code != requests.codes.ok:
+            print("Could not fetch the weather from", city)
+            input("Press Enter to continue")
 
-            print(".:     Weather Analyzer     :.")
-            print("-" * 30)
-            print("""| 1 | Cloud
-| 2 | Temperature
-| 3 | Wind
-| 4 | Humidity
-| 5 | Sun forecast
-| 6 | All of the above
-| 7 | Exit Weather Analyzer""")
-            print ("-" * 30)
-            print("Type the number for the alternative")
-            user_input = input("you wish to know more about: ")
-            os.system("cls") if os.name == "nt" else os.system("clear")
-            print(".:     Weather Analyzer     :.")
-            print("-" * 30)
+        if response.status_code == requests.codes.ok:
+            return response.json()
+    city = weather_updateCity()
+    weather = weather_getdata()
 
-            if user_input == "1":
-                weather_cloud()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "2":
-                weather_temp()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "3":
-                weather_wind()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "4":
-                weather_humid()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "5":
-                weather_sun()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "6":
-                weather_cloud()
-                print("-" * 30)
-                weather_temp()
-                print("-" * 30)
-                weather_wind()
-                print("-" * 30)
-                weather_humid()
-                print("-" * 30)
-                weather_sun()
-                print("-" * 30)
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "6":
-                weather_temp()
-                input ("Press Enter to continue")
-                continue
-            elif user_input == "7":
-                break
+    favorites = []
+    if os.path.exists ("favorites.json"):
+        with open ("favorites.json", "r") as myFile:
+            favorites = myFile.read()
+            favorites = json.loads(favorites)
+    else:
+        with open ("favorites.json", "a+") as myFile:
+            myFile.write(json.dumps(favorites))
+    
+    while True:  
+        os.system("cls") if os.name == "nt" else os.system("clear")
+
+        ui.header("Weather Analyzer")
+        ui.line()
+        print("| 1 | Cloud" + "|".rjust(19))
+        print("| 2 | Temperature" + "|".rjust(13))
+        print("| 3 | Wind" + "|".rjust(20))
+        print("| 4 | Humidity" + "|".rjust(16))
+        print("| 5 | Sun forecast" + "|".rjust(12))
+        print("| 6 | All of the above" + "|".rjust(8))
+        print("| 7 | View / Edit favorites" + "|".rjust(3))
+        print("| 8 | Exit Weather Analyzer" + "|".rjust(3))
+        ui.line()
+        print("Type the number for the alternative")
+        user_input = input("you wish to know more about: ")
+        os.system("cls") if os.name == "nt" else os.system("clear")
+        print(".:     Weather Analyzer     :.")
+        print("-" * 30)
+
+        if user_input == "1":
+            weather_cloud()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "2":
+            weather_temp()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "3":
+            weather_wind()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "4":
+            weather_humid()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "5":
+            weather_sun()
+            input ("Press Enter to continue")
+            continue
+        elif user_input == "6":
+            weather_cloud()
+            ui.line()
+            weather_temp()
+            ui.line()
+            weather_wind()
+            ui.line()
+            weather_humid()
+            ui.line()
+            weather_sun()
+            ui.line()
+            input ("Press Enter to continue")
+            continue
+
+        elif user_input == "7":
+            if len(favorites) > 0:
+                ui.header("Favorites")
+                ui.line()
+
+                i = 1
+                for items in favorites:
+                    item = f"| {i} | {items:<22} |"
+                    print (item)
+                    i += 1
+                ui.line()
+
+                print(f"Enter 'add' to add {city.capitalize()} to your favorite list")
+                print(f"Enter 'use' to analyze a city from your favorite list")
+                print(f"Enter 'del' to delete a city from your favorite list")
+                fav_input = input("Or press Enter to return > ")
+
+                if fav_input == "add":
+                    favorites.append(city.capitalize())
+                    with open ("favorites.json", "w") as myFile:
+                        myFile.write(json.dumps(favorites))
+                        print (city.capitalize(), "Added to favorites")
+                        input("Press Enter to continue")
+                        ui.line()
+                
+                elif fav_input == "use":
+                    try:
+                        fav_input = int(input("Enter the number representing the city you wish to analyze > "))
+                        city = favorites[(fav_input - 1)]
+                        print("Now analyzing", city)
+
+                    except (ValueError, IndexError):
+                        print("Could not find the item you entered")
+                        input("Press Enter to continue")
+                
+                elif fav_input == "del":
+                    try:
+                        fav_input = int(input("Enter the number representing the city you wish to remove > "))
+                        removed_item = favorites[(fav_input - 1)]
+                        favorites.pop(fav_input - 1)
+                        print(removed_item, "has been deleted from your list")
+                        with open ("favorites.json", "w") as myFile:
+                            myFile.write(json.dumps(favorites))
+
+                    except (ValueError, IndexError):
+                        print("Could not find the item you entered")
+                        input("Press Enter to continue")
+                
             else:
-                print("Invalid input")
-                input("Press Enter to continue")
-                continue
+                print("You have no favorites yet.")
+                print (f"Enter 'y' if you would like to add {city.capitalize()} to your favorites")
+                fav_input = input("or press Enter to return > ")
+                ui.line()
+
+                if fav_input == "y":
+                    favorites.append(city.capitalize())
+                    with open ("favorites.json", "w") as myFile:
+                        myFile.write(json.dumps(favorites))
+                        print (city.capitalize(), "Added to favorites")
+                        input("Press Enter to continue")
+            
+            continue
+
+        elif user_input == "8":
+            break
+        else:
+            print("Invalid input")
+            input("Press Enter to continue")
+            continue
 
 #     # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
