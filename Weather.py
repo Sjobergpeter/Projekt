@@ -43,18 +43,22 @@ def main():
         urlzone = f'https://api.api-ninjas.com/v1/worldtime?city={city}'
         response = requests.get(urlzone, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
         response_dict = json.loads(response.text)
-        
-        timezone_str = response_dict['timezone']
-        timezone = pytz.timezone(timezone_str)
-        
-        sunrise_utc = datetime.datetime.utcfromtimestamp(weather['sunrise'])
-        sunset_utc = datetime.datetime.utcfromtimestamp(weather['sunset'])
 
-        local_sunrise = sunrise_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
-        local_sunset = sunset_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
+        try:
+            timezone_str = response_dict['timezone']
+            timezone = pytz.timezone(timezone_str)
         
-        print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} and sets at {local_sunset.strftime('%H:%M')}")
+            sunrise_utc = datetime.datetime.utcfromtimestamp(weather['sunrise'])
+            sunset_utc = datetime.datetime.utcfromtimestamp(weather['sunset'])
 
+            local_sunrise = sunrise_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
+            local_sunset = sunset_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
+            
+            print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} and sets at {local_sunset.strftime('%H:%M')}")
+        
+        except KeyError:
+            print ("Could not find the sun in", city.capitalize())
+            input ("Press Enter to continue")
     
     def weather_getdata():
         api_url = f'https://api.api-ninjas.com/v1/weather?city={city}'
@@ -81,7 +85,7 @@ def main():
     while True:  
         os.system("cls") if os.name == "nt" else os.system("clear")
 
-        ui.header("Weather Analyzer")
+        ui.header(".:   Weather Analyzer   :.")
         ui.line()
         print("| 1 | Cloud" + "|".rjust(19))
         print("| 2 | Temperature" + "|".rjust(13))
@@ -94,6 +98,7 @@ def main():
         ui.line()
         print("Type the number for the alternative")
         user_input = input("you wish to know more about: ")
+
         os.system("cls") if os.name == "nt" else os.system("clear")
         print(".:     Weather Analyzer     :.")
         print("-" * 30)
@@ -102,22 +107,27 @@ def main():
             weather_cloud()
             input ("Press Enter to continue")
             continue
+
         elif user_input == "2":
             weather_temp()
             input ("Press Enter to continue")
             continue
+
         elif user_input == "3":
             weather_wind()
             input ("Press Enter to continue")
             continue
+
         elif user_input == "4":
             weather_humid()
             input ("Press Enter to continue")
             continue
+
         elif user_input == "5":
             weather_sun()
             input ("Press Enter to continue")
             continue
+
         elif user_input == "6":
             weather_cloud()
             ui.line()
@@ -142,15 +152,17 @@ def main():
                     item = f"| {i} | {items:<22} |"
                     print (item)
                     i += 1
-                ui.line()
 
+                ui.line()
                 print(f"Enter 'add' to add {city.capitalize()} to your favorite list")
                 print(f"Enter 'use' to analyze a city from your favorite list")
                 print(f"Enter 'del' to delete a city from your favorite list")
                 fav_input = input("Or press Enter to return > ")
+                ui.line()
 
                 if fav_input == "add":
                     favorites.append(city.capitalize())
+
                     with open ("favorites.json", "w") as myFile:
                         myFile.write(json.dumps(favorites))
                         print (city.capitalize(), "Added to favorites")
@@ -175,6 +187,7 @@ def main():
                         print(removed_item, "has been deleted from your list")
                         with open ("favorites.json", "w") as myFile:
                             myFile.write(json.dumps(favorites))
+                        input ("Press Enter to continue")
 
                     except (ValueError, IndexError):
                         print("Could not find the item you entered")
