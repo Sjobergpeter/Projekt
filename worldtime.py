@@ -199,6 +199,7 @@ def main(city_choice):
     # Går in i while-loopen ifall API hittar staden
     if city_exist(city_choice):
         while True:
+
             favorites = []
 
             # Hämtar och tilldelar favorites till favorites
