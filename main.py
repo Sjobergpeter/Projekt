@@ -18,9 +18,9 @@ def check_favorites():
 
     # Har en favorit hittats printar den ut alla
     else:
-        ui.echo("Your current favorites:")
+        ui.echo("Your current favorites:    |")
         for favorite in favorites:
-            ui.echo(favorite)
+            print(f"| {favorite:<{27}}|")
 
 
 # Huvudprogrammet som körs
