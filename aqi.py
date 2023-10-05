@@ -16,11 +16,14 @@ def get_air_quality(city_choice):
     response = requests.get(api_url, headers={"X-Api-Key": API_KEY})
     aqi_dictionary = json.loads(response.text)
     return aqi_dictionary
+    # Funktion som kallar på vår api och sedan returnerar dictionaryn från api:en
 
 
 def response_city(city_choice):
     api_url = f"https://api.api-ninjas.com/v1/airquality?city={city_choice}"
     response = requests.get(api_url, headers={"X-Api-Key": API_KEY})
+
+    # Följande kontrollerar ifall staden finns i apin och fortsätter koden ifall status koden är 200 som returneras
 
     if response.status_code == 200:
         return True
@@ -30,6 +33,10 @@ def response_city(city_choice):
 
 def print_aqi(aqi_info):
     overall_aqi = int(aqi_info["overall_aqi"])
+
+    # Vi tar info "overall air quality" från vår api och sedan skriver ut nedan ifall det är en bra eller
+    # dålig luftkvalite.
+
     if overall_aqi <= 50:
         print(f"This city has an overall air quality index of {overall_aqi}, this is very good :D")
     elif overall_aqi < 100:
@@ -45,6 +52,8 @@ def print_aqi(aqi_info):
 
 def print_aqi_list(aqi_info_dictionary):
     for info_name, info_value in aqi_info_dictionary.items():
+        # i följande går vi igenenom i en loop vår key och value i dictionaryn
+        # type funktionen jämnför datatypen info_value med dict om info_value är en dictionary fortsätter koden
         if type(info_value) is dict:
             aqi = info_value["aqi"]
             print(f"This is the overall aqi index levels: {aqi} for {info_name}")
@@ -55,6 +64,9 @@ def json_favorite():
     print("2 - Would you like to view your favorites?")
     json_choice = input("> ")
 
+    # i följande nedanför lägger vi till namnet på den staden vi vill spara i våran json fil
+    # som delas mellan alla våra moduler.
+
     if json_choice.lower() == "1":
         save_json = input("Enter the name of the city you would like to save: ")
         favorites.append(save_json)
@@ -64,6 +76,10 @@ def json_favorite():
 
     elif json_choice.lower() == "2":
         print("These are your favorites and their respective air quality scores: ")
+
+        # i följande del av koden kan vi se alla våra favorites som sparats, sedan grävar vi fram aqi infon för alla
+        # cities i favorites
+
         for cities in favorites:
             aqi_info = get_air_quality(cities)
             overall_aqi = int(aqi_info["overall_aqi"])
@@ -74,6 +90,8 @@ def json_favorite():
 
 
 def json_delete():
+
+    # Funktion för att skriva in namnet på den staden man önskar ta bort från favorites
     for cities in favorites:
         print(f"- {cities}")
     delete_favorite = input("Enter the name of the city you want to delete from favorites: ")
@@ -86,6 +104,7 @@ def json_delete():
 
 
 def get_city_choice(city):
+    # Funktion för att kalla på vår huvudmenys input om vilken stad som api ska söka efter.
     global city_choice
     city_choice = city
 
@@ -93,9 +112,9 @@ def get_city_choice(city):
 def main():
     get_city_choice(city_choice)
 
-    if response_city(city_choice):
+    if response_city(city_choice): # kontrollerar ifall staden finns i API:n innan kodens körs.
         while True:
-            print(city_choice.capitalize().center(30))
+            print(city_choice.capitalize().center(30)) # Titel på programmet om vilken stad dom skrivit in.
             print("-" * 30)
             print("1 - air quality information")
             print("2 - specific air quality information")
@@ -106,7 +125,7 @@ def main():
 
             menu_choice = input("Choose an option: ")
 
-            aqi_info = get_air_quality(city_choice)
+            aqi_info = get_air_quality(city_choice) # sätter variabel på dictionaryn
             print("-" * 30)
 
             if menu_choice == "1":
@@ -122,7 +141,7 @@ def main():
                 print("-" * 30)
                 break
     else:
-        print("This city does not exist...")
+        print("This city does not exist...") # main körs ej ifall staden ej får 200 response ping.
 
 
 if __name__ == "__main__":
