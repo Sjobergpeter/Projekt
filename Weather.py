@@ -7,12 +7,12 @@ import ui
 
 def main():
 
-    def weather_updateCity():
+    def weather_getcity():
         with open ("city.json", "r") as myFile:
             main_input = myFile.read()
             main_input = json.loads(main_input)
             return main_input.title()
-        
+    
     def weather_cloud():
         if weather['cloud_pct'] > 30 and weather['cloud_pct'] < 60:
             coverage = "partially cloudy"
@@ -78,7 +78,7 @@ def main():
             return response.json()
 
     # Hämtar användarens val av stad från huvudprogrammet och sedan data om den staden
-    city = weather_updateCity()
+    city = weather_getcity()
     weather = weather_getdata()
 
     # Hämtar favoritlistan eller skapar en tom om den inte finns
@@ -95,7 +95,7 @@ def main():
     while True:  
         os.system("cls") if os.name == "nt" else os.system("clear")
 
-        # 
+        # Här börjar UI
         ui.line()
         ui.header(".:   Weather Analyzer   :.")
         ui.line()
@@ -187,6 +187,11 @@ def main():
                     try:
                         fav_input = int(input("Enter the number representing the city you wish to analyze > "))
                         city = favorites[(fav_input - 1)]
+
+                        with open ("city.json", "w") as myFile:
+                            myFile.write(json.dumps(city))
+
+                        weather = weather_getdata()
                         print("Now analyzing", city)
 
                     except (ValueError, IndexError):
@@ -233,4 +238,6 @@ def main():
             input("Press Enter to continue")
             continue
 
-#     # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
+
+# Nedan är exempel på datan man får från API
+# {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
