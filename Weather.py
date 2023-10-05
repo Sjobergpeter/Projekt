@@ -6,40 +6,46 @@ import pytz
 import ui
 
 def main():
-    def weather_updateCity():
+
+    def weather_getcity():
         with open ("city.json", "r") as myFile:
             main_input = myFile.read()
             main_input = json.loads(main_input)
-            return main_input
-        
+            return main_input.title()
+    
     def weather_cloud():
-        coverage = ""
-        
         if weather['cloud_pct'] > 30 and weather['cloud_pct'] < 60:
             coverage = "partially cloudy"
+
         elif weather['cloud_pct'] >= 60:
             coverage = "cloudy"
+            
         else:
             coverage = "sunny"
-        print (f"It's {coverage} in {city.capitalize()} with a cloud coverage of {weather['cloud_pct']}%")
+        print (f"It's {coverage} in {city} with a cloud coverage of {weather['cloud_pct']}%")
 
     def weather_temp():
+        # Om temperaturen "Känns som" den aktuella temperaturen så behöver det inte nämnas
         if weather['temp'] != weather["feels_like"]:
             print (f"the temperature is currently at {weather['temp']}°C but feels like {weather['feels_like']} °C")
+
         else: 
             print (f"the temperature is currently at {weather['temp']}°C")
+
         print (f"The temperature range today will be between {weather['min_temp']}°C and {weather['max_temp']}°C")
 
     def weather_humid():
         print (f"Humidity level is at {weather['humidity']}%")
 
     def weather_wind():
+        # Vindstyrka och riktning i grader (0-360) blir mer lättläst i kardinaler
         degrees = weather["wind_degrees"]
         cardinals = ["Northern", "Northeastern", "Eastern", "Southeastern", "Southern", "Southwestern", "Western", "Northwestern", "Northern"]
         cardinal = cardinals[round(degrees / 45)]
         print (F"There's a {cardinal} wind at {weather['wind_speed']} meters per second")
 
     def weather_sun():
+        # Originell API hämtar soltimmar från angivna staden men utefter UTC tid. Denna URL är Worldtimes API för att kunna omvandla det till lokal tid
         urlzone = f'https://api.api-ninjas.com/v1/worldtime?city={city}'
         response = requests.get(urlzone, headers={'X-Api-Key': 'P56lgPDrmRuinArO1ubksg==A0OfMd46O71uIjAv'})
         response_dict = json.loads(response.text)
@@ -54,10 +60,10 @@ def main():
             local_sunrise = sunrise_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
             local_sunset = sunset_utc.replace(tzinfo=pytz.utc).astimezone(timezone)
             
-            print(f"Today the sun rises in {city.capitalize()} at {local_sunrise.strftime('%H:%M')} and sets at {local_sunset.strftime('%H:%M')}")
+            print(f"Today the sun rises in {city} at {local_sunrise.strftime('%H:%M')} and sets at {local_sunset.strftime('%H:%M')}")
         
         except KeyError:
-            print ("Could not find the sun in", city.capitalize())
+            print ("Could not find the sun in", city)
             input ("Press Enter to continue")
     
     def weather_getdata():
@@ -70,10 +76,14 @@ def main():
 
         if response.status_code == requests.codes.ok:
             return response.json()
-    city = weather_updateCity()
+
+    # Hämtar användarens val av stad från huvudprogrammet och sedan data om den staden
+    city = weather_getcity()
     weather = weather_getdata()
 
+    # Hämtar favoritlistan eller skapar en tom om den inte finns
     favorites = []
+    
     if os.path.exists ("favorites.json"):
         with open ("favorites.json", "r") as myFile:
             favorites = myFile.read()
@@ -85,7 +95,11 @@ def main():
     while True:  
         os.system("cls") if os.name == "nt" else os.system("clear")
 
+        # Här börjar UI
+        ui.line()
         ui.header(".:   Weather Analyzer   :.")
+        ui.line()
+        print(f"|{city.center(28)}|")
         ui.line()
         print("| 1 | Cloud" + "|".rjust(19))
         print("| 2 | Temperature" + "|".rjust(13))
@@ -154,18 +168,18 @@ def main():
                     i += 1
 
                 ui.line()
-                print(f"Enter 'add' to add {city.capitalize()} to your favorite list")
+                print(f"Enter 'add' to add {city} to your favorite list")
                 print(f"Enter 'use' to analyze a city from your favorite list")
                 print(f"Enter 'del' to delete a city from your favorite list")
                 fav_input = input("Or press Enter to return > ")
                 ui.line()
 
                 if fav_input == "add":
-                    favorites.append(city.capitalize())
+                    favorites.append(city)
 
                     with open ("favorites.json", "w") as myFile:
                         myFile.write(json.dumps(favorites))
-                        print (city.capitalize(), "Added to favorites")
+                        print (city, "Added to favorites")
                         input("Press Enter to continue")
                         ui.line()
                 
@@ -173,6 +187,11 @@ def main():
                     try:
                         fav_input = int(input("Enter the number representing the city you wish to analyze > "))
                         city = favorites[(fav_input - 1)]
+
+                        with open ("city.json", "w") as myFile:
+                            myFile.write(json.dumps(city))
+
+                        weather = weather_getdata()
                         print("Now analyzing", city)
 
                     except (ValueError, IndexError):
@@ -182,11 +201,14 @@ def main():
                 elif fav_input == "del":
                     try:
                         fav_input = int(input("Enter the number representing the city you wish to remove > "))
+                        
                         removed_item = favorites[(fav_input - 1)]
                         favorites.pop(fav_input - 1)
                         print(removed_item, "has been deleted from your list")
+
                         with open ("favorites.json", "w") as myFile:
                             myFile.write(json.dumps(favorites))
+
                         input ("Press Enter to continue")
 
                     except (ValueError, IndexError):
@@ -195,24 +217,27 @@ def main():
                 
             else:
                 print("You have no favorites yet.")
-                print (f"Enter 'y' if you would like to add {city.capitalize()} to your favorites")
+                print (f"Enter 'y' if you would like to add {city} to your favorites")
                 fav_input = input("or press Enter to return > ")
                 ui.line()
 
                 if fav_input == "y":
-                    favorites.append(city.capitalize())
+                    favorites.append(city)
                     with open ("favorites.json", "w") as myFile:
                         myFile.write(json.dumps(favorites))
-                        print (city.capitalize(), "Added to favorites")
+                        print (city, "Added to favorites")
                         input("Press Enter to continue")
             
             continue
 
         elif user_input == "8":
             break
+
         else:
             print("Invalid input")
             input("Press Enter to continue")
             continue
 
-#     # {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}
+
+# Nedan är exempel på datan man får från API
+# {"cloud_pct": 75, "temp": 17, "feels_like": 16, "humidity": 70, "min_temp": 14, "max_temp": 18, "wind_speed": 2.06, "wind_degrees": 0, "sunrise": 1695275057, "sunset": 1695319397}

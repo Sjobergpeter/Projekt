@@ -86,7 +86,7 @@ class City:
         except Exception as e:
             # Hanterar alla andra undantag
             print("An unknown exception occured:", e)
-            return
+            return e
 
         # Omvandlar capital true/false till text
         if city_dict[0]["is_capital"]:
@@ -134,7 +134,7 @@ class City:
                 city_obj.input_city = i
                 # Cityobjektet skickas till API
                 City.city_information(city_obj)
-                print(f'{i} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
+                print(f'{city_obj.city_name} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
                 ui.line()
             ui.prompt("Press enter to continue")
 
@@ -171,53 +171,59 @@ class City:
         holiday_info = City.get_holiday_api(city_obj)
         holiday_list = []
 
-        # Resultatet från sökningen skrivs ut
-        print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
-        print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
-        print(f'The location of the city is at \nlatitude {city_obj.latitude} and\nlongitude {city_obj.longitude}.')
-        ui.line()
-        holidays = ui.prompt(f'Would you like to see major\nholidays in {city_obj.country} (yes/no)?').lower()
-        ui.line()
-        # Om användaren vill visa holidays körs denna kod
-        if holidays == 'yes':
-            print(f'\n| Major holidays 2023 in {city_obj.country} |\n')
-
-            try:
-                # Loop som sparar dictionaryt i en lista efter datum och namn
-                for i in holiday_info:
-                    holiday_list.append([i['date'], i['name']])
-
-                # Helgdagslistan sorteras i datumordning och skrivs sedan ut
-                holiday_list.sort(key=lambda item: item[0])
-                for holiday in holiday_list:
-                    print(holiday[0], holiday[1])
-
-            except TypeError:
-                print('Something went wrong')
-            except Exception as e:
-                # Hanterar alla andra undantag
-                print("An unknown exception occured:", e)
-
-        ui.line()
-        # Låter användaren spara sin favorit
-        favorit = ui.prompt("Do you want to save this\n| city as your favorite? (y/n)").lower()
-
-        if favorit == "y":
-            favorites.append(city_obj.city_name)
-
-            with open("favorites.json", "w+") as b:
-                json.dump(favorites, b)
-
-            ui.echo(f"{city_obj.city_name} saved as a favorite.")
-            ui.prompt("Press enter to continue")
-
-        elif favorit == "n":
-
-            ui.echo(f"{city_obj.city_name} not saved as a favorite.")
-            ui.prompt("Press enter to continue")
+        # Kontroll om servern inte skulle returnerar någon information
+        if len(city_obj.city_name) < 1:
+            print('Server error: no city to display')
+            return
 
         else:
-            input("ERROR!")
+            # Resultatet från sökningen skrivs ut
+            print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
+            print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
+            print(f'The location of the city is at \nlatitude {city_obj.latitude} and\nlongitude {city_obj.longitude}.')
+            ui.line()
+            holidays = ui.prompt(f'Would you like to see major\n| holidays in {city_obj.country} (yes/no)?').lower()
+            ui.line()
+            # Om användaren vill visa holidays körs denna kod
+            if holidays == 'yes':
+                print(f'\n| Major holidays 2023 in {city_obj.country} |\n')
+
+                try:
+                    # Loop som sparar dictionaryt i en lista efter datum och namn
+                    for i in holiday_info:
+                        holiday_list.append([i['date'], i['name']])
+
+                    # Helgdagslistan sorteras i datumordning och skrivs sedan ut
+                    holiday_list.sort(key=lambda item: item[0])
+                    for holiday in holiday_list:
+                        print(holiday[0], holiday[1])
+
+                except TypeError:
+                    print('Something went wrong')
+                except Exception as e:
+                    # Hanterar alla andra undantag
+                    print("An unknown exception occured:", e)
+
+            ui.line()
+            # Låter användaren spara sin favorit
+            favorit = ui.prompt("Do you want to save this\n| city as your favorite? (y/n)").lower()
+
+            if favorit == "y":
+                favorites.append(city_obj.city_name)
+
+                with open("favorites.json", "w+") as b:
+                    json.dump(favorites, b)
+
+                ui.echo(f"{city_obj.city_name} saved as a favorite.")
+                ui.prompt("Press enter to continue")
+
+            elif favorit == "n":
+
+                ui.echo(f"{city_obj.city_name} not saved as a favorite.")
+                ui.prompt("Press enter to continue")
+
+            else:
+                input("ERROR!")
 
     # Metod som anropas från huvudmenyn och returnerar city information.
     # Körs första gången sedan körs City.main() metoden
@@ -238,12 +244,18 @@ class City:
             ui.header("CITY DATA")
             ui.line()
             # Resultatet från sökningen skrivs ut
-            print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
-            print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
-            print(f'The location of the city is at \nlatitude {city_obj.latitude} and longitude\n{city_obj.longitude}.')
-            ui.line()
-            input('> Press Enter to continue\n')
-            City.main()
+            # Kontroll om servern inte skulle returnerar någon information
+            if len(city_obj.city_name) > 1:
+                print(f'\n{city_obj.city_name} is a city in {city_obj.country}\nand {city_obj.capital}.')
+                print(f'The population of {city_obj.city_name} \nis {city_obj.population:,}.')
+                print(f'The location of the city is at \nlatitude {city_obj.latitude} '
+                      f'and longitude\n{city_obj.longitude}.')
+                ui.line()
+                input('> Press Enter to continue\n')
+                City.main()
+            else:
+                print('Server error: could not find the city')
+                City.main()
         else:
             print('Error, the city is not in the database')
             input('> Press Enter to continue\n')
