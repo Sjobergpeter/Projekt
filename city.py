@@ -134,7 +134,7 @@ class City:
                 city_obj.input_city = i
                 # Cityobjektet skickas till API
                 City.city_information(city_obj)
-                print(f'{i} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
+                print(f'{city_obj.city_name} is a city in {city_obj.country}\nThe population is {city_obj.population:,}.')
                 ui.line()
             ui.prompt("Press enter to continue")
 
