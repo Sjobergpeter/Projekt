@@ -113,6 +113,13 @@ def new_city():
     favorit = ui.prompt("Do you want to save this city as your favorite? (y/n)").lower()
     while True:
         if favorit == "y":
+
+            favorites = []
+
+            if os.path.isfile("favorites.json"):
+                with open("favorites.json") as f:
+                    favorites = json.load(f)
+
             favorites.append(city_info['city'])
 
             with open("favorites.json", "w+") as b:
@@ -232,7 +239,6 @@ def main(city_choice):
 
             # Användaren får ett val
             choice = ui.prompt("Type your choice")
-            ui.line()
 
             # Tilldelar valen till funktioner
             if choice == "1":
