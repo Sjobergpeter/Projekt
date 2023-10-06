@@ -182,6 +182,13 @@ def lookup_favorites():
 
 # Val 4 - Ta bort favoriter
 def delete_favorites():
+    favorites = []
+
+    # Hämtar och tilldelar favorites till favorites
+    if os.path.isfile("favorites.json"):
+        with open("favorites.json", "r") as f:
+            favorites = json.load(f)
+
     if not favorites:
         ui.prompt("You dont have have favorite cities to remove, press enter to continue")
         return
