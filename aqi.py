@@ -23,7 +23,7 @@ def response_city(city_choice):
     api_url = f"https://api.api-ninjas.com/v1/airquality?city={city_choice}"
     response = requests.get(api_url, headers={"X-Api-Key": API_KEY})
 
-    # Följande kontrollerar ifall staden finns i apin och fortsätter koden ifall status koden är 200 som returneras
+    # Följande kontrollerar ifall staden finns i api:n och fortsätter koden ifall status koden är 200 som returneras
 
     if response.status_code == 200:
         return True
