@@ -113,6 +113,7 @@ def main():
         print("Type the number for the alternative")
         user_input = input("you wish to know more about: ")
 
+        # Användaren får välja alternativ de vill utföra
         os.system("cls") if os.name == "nt" else os.system("clear")
         print(".:     Weather Analyzer     :.")
         print("-" * 30)
@@ -142,6 +143,7 @@ def main():
             input ("Press Enter to continue")
             continue
 
+        # Detta alternativ skriver ut samtliga funktioner
         elif user_input == "6":
             weather_cloud()
             ui.line()
@@ -156,6 +158,7 @@ def main():
             input ("Press Enter to continue")
             continue
 
+            # Lista av favoritstäder
         elif user_input == "7":
             if len(favorites) > 0:
                 ui.header("Favorites")
@@ -174,6 +177,7 @@ def main():
                 fav_input = input("Or press Enter to return > ")
                 ui.line()
 
+                # Lägg till stad som du valde från main programmet
                 if fav_input == "add":
                     favorites.append(city)
 
@@ -182,7 +186,8 @@ def main():
                         print (city, "Added to favorites")
                         input("Press Enter to continue")
                         ui.line()
-                
+
+                # Byt till en stad från din favoritlista
                 elif fav_input == "use":
                     try:
                         fav_input = int(input("Enter the number representing the city you wish to analyze > "))
@@ -197,7 +202,8 @@ def main():
                     except (ValueError, IndexError):
                         print("Could not find the item you entered")
                         input("Press Enter to continue")
-                
+                        
+                # Ta bort en stad från din favoritlista
                 elif fav_input == "del":
                     try:
                         fav_input = int(input("Enter the number representing the city you wish to remove > "))
@@ -215,6 +221,7 @@ def main():
                         print("Could not find the item you entered")
                         input("Press Enter to continue")
                 
+                # Om favoritlistan är tom så erbjuds användaren endast att lägga till den stad som valdes i main
             else:
                 print("You have no favorites yet.")
                 print (f"Enter 'y' if you would like to add {city} to your favorites")
@@ -230,6 +237,7 @@ def main():
             
             continue
 
+        # Avsluta programmet
         elif user_input == "8":
             break
 
