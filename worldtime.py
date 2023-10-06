@@ -70,9 +70,11 @@ def format_time(hour, minute):
 
 # Hämtar relevant info från staden
 def city_information(city):
+    # Hämtar info från API
     city_info = get_api(city)
 
     # Hämtar allt vi behöver från dictionary
+    # Tilldelar detta till variabler
     timezone = city_info['timezone']
     datetime = city_info['datetime']
     date = format_date(city_info['year'], city_info['month'], city_info['day'])
@@ -80,7 +82,7 @@ def city_information(city):
     day_of_week = city_info['day_of_week']
     hour = city_info['hour']
 
-    # Tilldelar detta
+    # Returnerar detta i en dictionary
     return {
         'city': city,
         'timezone': timezone,
@@ -103,9 +105,10 @@ def print_city_info(city_info):
 # -- FUNKTIONER FÖR ALLA VAL -- #
 # Val 1 - Allmän info
 def new_city():
+    # Tilldelar city_information-funktionen till city_info med arg = staden användaren skrev i main.py
     city_info = city_information(city_choice)
 
-    # Utskrift
+    # Utskrift av funktionen city_information(city_choice)
     print_city_info(city_info)
 
     ui.line()
@@ -113,15 +116,18 @@ def new_city():
     favorit = ui.prompt("Do you want to save this city as your favorite? (y/n)").lower()
     while True:
         if favorit == "y":
-
+            # Tom lista
             favorites = []
 
+            # Läser av favorites.json
             if os.path.isfile("favorites.json"):
                 with open("favorites.json") as f:
                     favorites = json.load(f)
 
+            # Lägger till staden som användaren skrivit i main.py
             favorites.append(city_info['city'])
 
+            # Sparar tillägget till favorites.json
             with open("favorites.json", "w+") as b:
                 json.dump(favorites, b)
 
@@ -169,12 +175,16 @@ def lookup_favorites():
         with open("favorites.json", "r") as f:
             favorites = json.load(f)
 
+    # Ingen favorit hittas
     if not favorites:
         ui.prompt("You dont have any favorite cities saved, press enter to continue")
 
     else:
+        # Loopar igenom hela favorites-listan
         for city in favorites:
+            # För varje stad den hittar tilldelar den funktionen city_information till den staden
             city_info = city_information(city)
+            # Sedan skriver den ut staden
             print_city_info(city_info)
         ui.line()
         ui.prompt("Press enter to continue")
@@ -182,6 +192,7 @@ def lookup_favorites():
 
 # Val 4 - Ta bort favoriter
 def delete_favorites():
+    # Tom lista
     favorites = []
 
     # Hämtar och tilldelar favorites till favorites
@@ -193,13 +204,18 @@ def delete_favorites():
         ui.prompt("You dont have have favorite cities to remove, press enter to continue")
         return
     ui.header("Your favorites right now:")
+
+    # Skriver ut alla städer i favorites
     for n in favorites:
         ui.echo(n)
 
     delete = ui.prompt("What city do you want to remove")
 
+    # Kollar så valet finns i favorites
     if delete in favorites:
+        # Tar bort den ur listan med remove
         favorites.remove(delete)
+        # Sparar ändringen i favorites.json
         with open("favorites.json", "w+") as f:
             json.dump(favorites, f)
 
@@ -214,6 +230,7 @@ def main(city_choice):
     if city_exist(city_choice):
         while True:
 
+            # Tom lista
             favorites = []
 
             # Hämtar och tilldelar favorites till favorites
@@ -227,10 +244,10 @@ def main(city_choice):
             ui.header("WORLD TIMES")
             ui.line()
             ui.echo("Your favorite places:")
-
+            # Ifall listan är tom
             if not favorites:
                 ui.echo("No favorite is saved right now")
-
+            # Finns värde i listan skrivs den ut
             for favorite in favorites:
                 ui.echo(favorite)
 
